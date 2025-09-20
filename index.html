@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">return s.replace(/[&amp;&lt;&gt;"']/g, (c)=&gt;({ '&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;','"':'&amp;quot;','\'':'&amp;#39;' }[c]));</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">convertBtn.addEventListener('click', ()=&gt;{</span></p>
+<p class="p1"><span class="s1">if(!loadedFile) return;</span></p>
+<p class="p1"><span class="s1">try{</span></p>
+<p class="p1"><span class="s1">const tgt = target.value;</span></p>
+<p class="p1"><span class="s1">if(tgt==='csv'){</span></p>
+<p class="p1"><span class="s1">if(tablePreview){</span></p>
+<p class="p1"><span class="s1">const { header, rows } = tablePreview;</span></p>
+<p class="p1"><span class="s1">const csv = Papa.unparse([header, ...rows], { delimiter: delimiter.value || ',' });</span></p>
+<p class="p1"><span class="s1">downloadText(csv, swapExt(loadedFile.name, '.csv'));</span></p>
+<p class="p1"><span class="s1">} else if(jsonPreview){</span></p>
+<p class="p1"><span class="s1">let out = '';</span></p>
+<p class="p1"><span class="s1">if(Array.isArray(jsonPreview) &amp;&amp; jsonPreview.length &amp;&amp; typeof jsonPreview[0]==='object'){</span></p>
+<p class="p1"><span class="s1">const { header, rows } = objectsToAOA(jsonPreview);</span></p>
+<p class="p1"><span class="s1">out = Papa.unparse([header, ...rows], { delimiter: delimiter.value || ',' });</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">out = JSON.stringify(jsonPreview,null,2);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">downloadText(out, swapExt(loadedFile.name, '.csv'));</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">} else if(tgt==='json'){</span></p>
+<p class="p1"><span class="s1">if(tablePreview){</span></p>
+<p class="p1"><span class="s1">const { header, rows } = tablePreview;</span></p>
+<p class="p1"><span class="s1">const objs = rows.map(r=&gt; Object.fromEntries(header.map((h,i)=&gt;[h, r[i]])) );</span></p>
+<p class="p1"><span class="s1">downloadText(JSON.stringify(objs,null,2), swapExt(loadedFile.name, '.json'));</span></p>
+<p class="p1"><span class="s1">} else if(jsonPreview){</span></p>
+<p class="p1"><span class="s1">downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">} else if(tgt==='xlsx'){</span></p>
+<p class="p1"><span class="s1">if(tablePreview){</span></p>
+<p class="p1"><span class="s1">const { header, rows } = tablePreview; const aoa=[header,...rows];</span></p>
+<p class="p1"><span class="s1">const ws = XLSX.utils.aoa_to_sheet(aoa); const wb = XLSX.utils.book_new();</span></p>
+<p class="p1"><span class="s1">XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');</span></p>
+<p class="p1"><span class="s1">const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});</span></p>
+<p class="p1"><span class="s1">const blob = new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });</span></p>
+<p class="p1"><span class="s1">downloadBlob(blob, swapExt(loadedFile.name, '.xlsx'));</span></p>
+<p class="p1"><span class="s1">} else if(jsonPreview){</span></p>
+<p class="p1"><span class="s1">if(Array.isArray(jsonPreview) &amp;&amp; jsonPreview.length &amp;&amp; typeof jsonPreview[0]==='object'){</span></p>
+<p class="p1"><span class="s1">const { header, rows } = objectsToAOA(jsonPreview);</span></p>
+<p class="p1"><span class="s1">const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);</span></p>
+<p class="p1"><span class="s1">const wb = XLSX.utils.book_new();</span></p>
+<p class="p1"><span class="s1">XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');</span></p>
+<p class="p1"><span class="s1">const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});</span></p>
+<p class="p1"><span class="s1">const blob = new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });</span></p>
+<p class="p1"><span class="s1">downloadBlob(blob, swapExt(loadedFile.name, '.xlsx'));</span></p>
+<p class="p1"><span class="s1">} else {</span></p>
+<p class="p1"><span class="s1">downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">} catch(err){</span></p>
+<p class="p1"><span class="s1">errorBox.style.display='block'; errorBox.textContent = (err &amp;&amp; err.message) ? err.message : String(err);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function swapExt(name,next){ const i=name.lastIndexOf('.'); return i===-1 ? name+next : name.slice(0,i)+next; }</span></p>
+<p class="p1"><span class="s1">function downloadText(text, filename){ const blob=new Blob([text],{type:'text/plain;charset=utf-8'}); downloadBlob(blob, filename); }</span></p>
+<p class="p1"><span class="s1">function downloadBlob(blob, filename){ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
