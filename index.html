@@ -1,82 +1,304 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Adigi Sync — Local File Converter (CSV ↔ XLSX ↔ JSON)</title>
+  <meta name="description" content="Adigi Sync: privacy-first, in-browser file conversion. No uploads. CSV ↔ XLSX ↔ JSON with preview, light cleaning, and instant download." />
+  <style>
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;background:#f7fafc;color:#1b2533}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .badge{font-size:12px;color:#047857;background:#ecfeff;border:1px solid #bae6fd;padding:4px 8px;border-radius:999px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:980px){.grid{grid-template-columns:360px 1fr}}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+    .card .body{padding:16px}
+    .drop{border:2px dashed #cbd5e1;border-radius:16px;padding:18px;text-align:center;transition:.2s}
+    .drop.drag{border-color:#22c55e;background:#f0fdf4}
+    .muted{color:#6b7280;font-size:12px}
+    .row{display:flex;gap:10px;align-items:center}.row>label{font-size:12px;width:120px}
+    input[type="text"],select{width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:10px}
+    .switch{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+    button{border:0;background:#0ea5e9;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid #eef2f7;padding:8px 10px;text-align:left;font-size:13px;white-space:nowrap;vertical-align:top}
+    thead th{position:sticky;top:0;background:#fff}
+    pre{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:12px;padding:12px;overflow:auto}
+    footer{margin:18px 0;color:#6b7280;font-size:12px}
+    .error{color:#b91c1c;font-size:12px}
   </style>
+  <!-- Libraries via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">return s.replace(/[&amp;&lt;&gt;"']/g, (c)=&gt;({ '&amp;':'&amp;amp;','&lt;':'&amp;lt;','&gt;':'&amp;gt;','"':'&amp;quot;','\'':'&amp;#39;' }[c]));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">convertBtn.addEventListener('click', ()=&gt;{</span></p>
-<p class="p1"><span class="s1">if(!loadedFile) return;</span></p>
-<p class="p1"><span class="s1">try{</span></p>
-<p class="p1"><span class="s1">const tgt = target.value;</span></p>
-<p class="p1"><span class="s1">if(tgt==='csv'){</span></p>
-<p class="p1"><span class="s1">if(tablePreview){</span></p>
-<p class="p1"><span class="s1">const { header, rows } = tablePreview;</span></p>
-<p class="p1"><span class="s1">const csv = Papa.unparse([header, ...rows], { delimiter: delimiter.value || ',' });</span></p>
-<p class="p1"><span class="s1">downloadText(csv, swapExt(loadedFile.name, '.csv'));</span></p>
-<p class="p1"><span class="s1">} else if(jsonPreview){</span></p>
-<p class="p1"><span class="s1">let out = '';</span></p>
-<p class="p1"><span class="s1">if(Array.isArray(jsonPreview) &amp;&amp; jsonPreview.length &amp;&amp; typeof jsonPreview[0]==='object'){</span></p>
-<p class="p1"><span class="s1">const { header, rows } = objectsToAOA(jsonPreview);</span></p>
-<p class="p1"><span class="s1">out = Papa.unparse([header, ...rows], { delimiter: delimiter.value || ',' });</span></p>
-<p class="p1"><span class="s1">} else {</span></p>
-<p class="p1"><span class="s1">out = JSON.stringify(jsonPreview,null,2);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">downloadText(out, swapExt(loadedFile.name, '.csv'));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">} else if(tgt==='json'){</span></p>
-<p class="p1"><span class="s1">if(tablePreview){</span></p>
-<p class="p1"><span class="s1">const { header, rows } = tablePreview;</span></p>
-<p class="p1"><span class="s1">const objs = rows.map(r=&gt; Object.fromEntries(header.map((h,i)=&gt;[h, r[i]])) );</span></p>
-<p class="p1"><span class="s1">downloadText(JSON.stringify(objs,null,2), swapExt(loadedFile.name, '.json'));</span></p>
-<p class="p1"><span class="s1">} else if(jsonPreview){</span></p>
-<p class="p1"><span class="s1">downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">} else if(tgt==='xlsx'){</span></p>
-<p class="p1"><span class="s1">if(tablePreview){</span></p>
-<p class="p1"><span class="s1">const { header, rows } = tablePreview; const aoa=[header,...rows];</span></p>
-<p class="p1"><span class="s1">const ws = XLSX.utils.aoa_to_sheet(aoa); const wb = XLSX.utils.book_new();</span></p>
-<p class="p1"><span class="s1">XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');</span></p>
-<p class="p1"><span class="s1">const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});</span></p>
-<p class="p1"><span class="s1">const blob = new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });</span></p>
-<p class="p1"><span class="s1">downloadBlob(blob, swapExt(loadedFile.name, '.xlsx'));</span></p>
-<p class="p1"><span class="s1">} else if(jsonPreview){</span></p>
-<p class="p1"><span class="s1">if(Array.isArray(jsonPreview) &amp;&amp; jsonPreview.length &amp;&amp; typeof jsonPreview[0]==='object'){</span></p>
-<p class="p1"><span class="s1">const { header, rows } = objectsToAOA(jsonPreview);</span></p>
-<p class="p1"><span class="s1">const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);</span></p>
-<p class="p1"><span class="s1">const wb = XLSX.utils.book_new();</span></p>
-<p class="p1"><span class="s1">XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');</span></p>
-<p class="p1"><span class="s1">const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});</span></p>
-<p class="p1"><span class="s1">const blob = new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });</span></p>
-<p class="p1"><span class="s1">downloadBlob(blob, swapExt(loadedFile.name, '.xlsx'));</span></p>
-<p class="p1"><span class="s1">} else {</span></p>
-<p class="p1"><span class="s1">downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">} catch(err){</span></p>
-<p class="p1"><span class="s1">errorBox.style.display='block'; errorBox.textContent = (err &amp;&amp; err.message) ? err.message : String(err);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function swapExt(name,next){ const i=name.lastIndexOf('.'); return i===-1 ? name+next : name.slice(0,i)+next; }</span></p>
-<p class="p1"><span class="s1">function downloadText(text, filename){ const blob=new Blob([text],{type:'text/plain;charset=utf-8'}); downloadBlob(blob, filename); }</span></p>
-<p class="p1"><span class="s1">function downloadBlob(blob, filename){ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+  <div class="wrap">
+    <header>
+      <h1 style="margin:0;font-size:22px">Adigi Sync</h1>
+      <span class="badge">Privacy-first • Local processing</span>
+    </header>
+    <p class="muted" style="margin-top:0;max-width:720px">Convert files entirely in your browser. CSV ↔ XLSX ↔ JSON with preview and light cleaning. Nothing is uploaded.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="body" id="controls">
+          <h3 style="margin:0 0 8px 0;font-size:14px;color:#111827">1) Load a file</h3>
+          <div id="drop" class="drop">
+            <div style="font-size:13px;margin-bottom:6px">Drag & drop CSV / XLSX / JSON</div>
+            <div class="muted">or</div>
+            <div style="margin-top:8px"><button id="browse">Browse</button></div>
+            <input id="file" type="file" accept=".csv,.xlsx,.xls,.json" style="display:none" />
+            <div id="loaded" class="muted" style="margin-top:8px;display:none"></div>
+          </div>
+
+          <hr style="border:0;border-top:1px solid #e5e7eb;margin:16px 0" />
+
+          <h3 style="margin:0 0 8px 0;font-size:14px;color:#111827">2) Options</h3>
+          <div class="row" style="margin-bottom:8px">
+            <label for="target">Target format</label>
+            <select id="target">
+              <option value="xlsx">XLSX</option>
+              <option value="csv">CSV</option>
+              <option value="json">JSON</option>
+            </select>
+          </div>
+          <div class="row" style="margin-bottom:8px">
+            <label for="delimiter">CSV delimiter</label>
+            <input id="delimiter" type="text" value="," />
+          </div>
+          <div class="row" style="margin-bottom:8px">
+            <label>Header row</label>
+            <label class="switch"><input id="hasHeader" type="checkbox" checked /> <span>Enabled</span></label>
+          </div>
+          <div class="row" style="margin-bottom:8px">
+            <label>Normalise columns</label>
+            <label class="switch"><input id="normalise" type="checkbox" checked /> <span>Enabled</span></label>
+          </div>
+          <div class="row" style="margin-bottom:8px">
+            <label>Deduplicate rows</label>
+            <label class="switch"><input id="dedupe" type="checkbox" /> <span>Enabled</span></label>
+          </div>
+
+          <div id="progressText" class="muted" style="display:none;margin-top:6px">Processing…</div>
+          <div id="error" class="error" style="display:none"></div>
+
+          <div style="margin-top:12px"><button id="convert" disabled>Convert & Download</button></div>
+          <div class="muted" style="margin-top:8px">Files stay in your browser. No uploads.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="body">
+          <h3 style="margin:0 0 8px 0;font-size:14px;color:#111827">Preview</h3>
+          <div id="preview" class="muted">Drop a CSV / XLSX / JSON file to preview here.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>© <span id="y"></span> Adigi. Local-first conversion MVP.</footer>
+  </div>
+
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  let loadedFile = null;
+  let inferredType = 'unknown';
+  let tablePreview = null;
+  let jsonPreview = null;
+
+  const $ = (id) => document.getElementById(id);
+  const drop = $('drop');
+  const fileInput = $('file');
+  const browse = $('browse');
+  const loaded = $('loaded');
+  const preview = $('preview');
+  const target = $('target');
+  const delimiter = $('delimiter');
+  const hasHeader = $('hasHeader');
+  const normalise = $('normalise');
+  const dedupe = $('dedupe');
+  const progressText = $('progressText');
+  const errorBox = $('error');
+  const convertBtn = $('convert');
+
+  browse.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => { const f = e.target.files[0]; if (f) handleFile(f); });
+
+  drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', (e) => {
+    e.preventDefault(); drop.classList.remove('drag');
+    const f = e.dataTransfer.files[0]; if (f) handleFile(f);
+  });
+
+  function detectType(name) {
+    const n = name.toLowerCase();
+    if (n.endsWith('.csv')) return 'csv';
+    if (n.endsWith('.xlsx') || n.endsWith('.xls')) return 'xlsx';
+    if (n.endsWith('.json')) return 'json';
+    return 'unknown';
+  }
+
+  function normaliseKey(k){
+    return k.normalize('NFKD')
+      .replace(/\\p{Diacritic}/gu,'')
+      .replace(/[^\\p{L}\\p{N}]+/gu,'_')
+      .replace(/_{2,}/g,'_')
+      .replace(/^_|_$/g,'')
+      .toLowerCase();
+  }
+
+  function dedupeRows(rows){
+    const seen=new Set(); const out=[];
+    for(const r of rows){ const key=JSON.stringify(r); if(!seen.has(key)){ seen.add(key); out.push(r);} }
+    return out;
+  }
+
+  function objectsToAOA(objs){
+    const header = Array.from(objs.reduce((s,o)=>{ Object.keys(o).forEach(k=>s.add(k)); return s; }, new Set()));
+    const rows = objs.map(o=>header.map(h=> o[h] ?? ''));
+    return { header, rows };
+  }
+
+  async function handleFile(f){
+    errorBox.style.display='none'; errorBox.textContent='';
+    progressText.style.display='block';
+    preview.innerHTML = '<span class="muted">Parsing…</span>';
+    convertBtn.disabled = true; tablePreview=null; jsonPreview=null;
+
+    loadedFile = f; inferredType = detectType(f.name);
+    loaded.style.display='block';
+    loaded.textContent = 'Loaded: ' + f.name + ' (' + inferredType.toUpperCase() + ')';
+
+    try{
+      if(inferredType==='csv'){
+        const text = await f.text();
+        const parsed = Papa.parse(text, { delimiter: delimiter.value || ',', skipEmptyLines: true });
+        if(parsed.errors && parsed.errors.length){ throw new Error(parsed.errors[0].message); }
+        let data = parsed.data;
+        let header=[]; let rows=[];
+        if(hasHeader.checked && data.length>0){
+          header = data[0].map(h=> normalise.checked ? normaliseKey(String(h)) : String(h));
+          rows = data.slice(1).map(r=> r.map(c=> String(c ?? '')));
+        } else if(data.length>0){
+          const width = Math.max(...data.map(r=>r.length));
+          header = Array.from({length:width},(_,i)=>'col_'+(i+1));
+          rows = data.map(r=> r.map(c=> String(c ?? '')));
+        }
+        if(dedupe.checked) rows = dedupeRows(rows);
+        tablePreview = { header, rows };
+        renderTablePreview();
+      } else if(inferredType==='xlsx'){
+        const ab = await f.arrayBuffer();
+        const wb = XLSX.read(ab,{type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const aoa = XLSX.utils.sheet_to_json(ws,{header:1,raw:false});
+        let header=[]; let rows=[];
+        if(aoa.length>0){
+          header = aoa[0].map(h=> normalise.checked ? normaliseKey(String(h ?? '')) : String(h ?? ''));
+          rows = aoa.slice(1).map(r=> r.map(c=> c==null ? '' : String(c)));
+        }
+        if(dedupe.checked) rows = dedupeRows(rows);
+        tablePreview = { header, rows };
+        renderTablePreview();
+      } else if(inferredType==='json'){
+        const text = await f.text(); const obj = JSON.parse(text);
+        if(Array.isArray(obj)){
+          if(obj.length && typeof obj[0]==='object' && obj[0]!==null){
+            const normed = normalise.checked ? obj.map(o=>{ const out={}; Object.keys(o).forEach(k=> out[normaliseKey(k)] = o[k]); return out; }) : obj;
+            const { header, rows } = objectsToAOA(normed);
+            tablePreview = { header, rows: dedupe.checked ? dedupeRows(rows) : rows };
+            renderTablePreview();
+          } else { jsonPreview = obj; renderJsonPreview(); }
+        } else if(typeof obj==='object' && obj){ jsonPreview=obj; renderJsonPreview(); }
+        else { jsonPreview=obj; renderJsonPreview(); }
+      } else {
+        throw new Error('Unsupported file type. Use CSV, XLSX or JSON.');
+      }
+      convertBtn.disabled = false;
+    } catch(err){
+      errorBox.style.display='block'; errorBox.textContent = (err && err.message) ? err.message : String(err);
+      preview.innerHTML = '<span class="error">Failed to parse file.</span>';
+    } finally {
+      progressText.style.display='none';
+    }
+  }
+
+  function renderTablePreview(){
+    const { header, rows } = tablePreview || { header:[], rows:[] };
+    const maxRows = 100; const show = rows.slice(0,maxRows);
+    let html = '<div style="overflow:auto;max-height:480px"><table><thead><tr>' +
+      header.map(h=>'<th>'+escapeHtml(h)+'</th>').join('') +
+      '</tr></thead><tbody>' +
+      show.map(r=>'<tr>'+ r.map(c=>'<td>'+escapeHtml(String(c))+'</td>').join('') + '</tr>').join('') +
+      '</tbody></table></div>';
+    if(rows.length>maxRows){ html += '<div class="muted">Showing first '+maxRows+' rows.</div>'; }
+    preview.innerHTML = html;
+  }
+
+  function renderJsonPreview(){
+    preview.innerHTML = '<pre>'+escapeHtml(JSON.stringify(jsonPreview,null,2))+'</pre>';
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>\"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\\'':'&#39;'})[c]; });
+  }
+
+  convertBtn.addEventListener('click', function(){
+    if(!loadedFile) return;
+    try{
+      const tgt = target.value;
+      if(tgt==='csv'){
+        if(tablePreview){
+          const csv = Papa.unparse([tablePreview.header, ...tablePreview.rows], { delimiter: delimiter.value || ',' });
+          downloadText(csv, swapExt(loadedFile.name, '.csv'));
+        } else if(jsonPreview){
+          let out = '';
+          if(Array.isArray(jsonPreview) && jsonPreview.length && typeof jsonPreview[0]==='object'){
+            const { header, rows } = objectsToAOA(jsonPreview);
+            out = Papa.unparse([header, ...rows], { delimiter: delimiter.value || ',' });
+          } else {
+            out = JSON.stringify(jsonPreview,null,2);
+          }
+          downloadText(out, swapExt(loadedFile.name, '.csv'));
+        }
+      } else if(tgt==='json'){
+        if(tablePreview){
+          const { header, rows } = tablePreview;
+          const objs = rows.map(function(r){ return Object.fromEntries(header.map(function(h,i){ return [h, r[i]]; })); });
+          downloadText(JSON.stringify(objs,null,2), swapExt(loadedFile.name, '.json'));
+        } else if(jsonPreview){
+          downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));
+        }
+      } else if(tgt==='xlsx'){
+        if(tablePreview){
+          const { header, rows } = tablePreview;
+          const ws = XLSX.utils.aoa_to_sheet([header, ...rows]); const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+          const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});
+          downloadBlob(new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), swapExt(loadedFile.name, '.xlsx'));
+        } else if(jsonPreview){
+          if(Array.isArray(jsonPreview) && jsonPreview.length && typeof jsonPreview[0]==='object'){
+            const { header, rows } = objectsToAOA(jsonPreview);
+            const ws = XLSX.utils.aoa_to_sheet([header, ...rows]); const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});
+            downloadBlob(new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), swapExt(loadedFile.name, '.xlsx'));
+          } else {
+            downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));
+          }
+        }
+      }
+    } catch(err){
+      errorBox.style.display='block'; errorBox.textContent = (err && err.message) ? err.message : String(err);
+    }
+  });
+
+  function swapExt(name,next){ const i=name.lastIndexOf('.'); return i===-1 ? name+next : name.slice(0,i)+next; }
+  function downloadText(text, filename){ const blob=new Blob([text],{type:'text/plain;charset=utf-8'}); downloadBlob(blob, filename); }
+  function downloadBlob(blob, filename){ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+</script>
 </body>
 </html>
