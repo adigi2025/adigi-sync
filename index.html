@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Adigi Sync — Local File Converter (CSV ↔ XLSX ↔ JSON)</title>
   <meta name="description" content="Adigi Sync: privacy-first, in-browser file conversion. No uploads. CSV ↔ XLSX ↔ JSON with preview, light cleaning, and instant download." />
+  <link rel="icon" href="favicon.png">
+  <meta property="og:title" content="Adigi Sync — CSV ↔ XLSX ↔ JSON in your browser">
+  <meta property="og:description" content="Privacy-first, no uploads. Preview + light cleaning.">
   <style>
     *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;background:#f7fafc;color:#1b2533}
     .wrap{max-width:1100px;margin:0 auto;padding:24px}
@@ -28,6 +31,8 @@
     pre{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:12px;padding:12px;overflow:auto}
     footer{margin:18px 0;color:#6b7280;font-size:12px}
     .error{color:#b91c1c;font-size:12px}
+    .btn{display:inline-block;background:#0ea5e9;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   </style>
   <!-- Libraries via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -48,7 +53,11 @@
           <div id="drop" class="drop">
             <div style="font-size:13px;margin-bottom:6px">Drag & drop CSV / XLSX / JSON</div>
             <div class="muted">or</div>
-            <div style="margin-top:8px"><label for="file" style="display:inline-block;background:#0ea5e9;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer">Browse</label></div><input id="file" type="file" accept=".csv,.xlsx,.xls,.json" style="display:none" />
+            <div style="margin-top:8px">
+              <!-- Label triggers the hidden input reliably on all browsers -->
+              <label for="file" class="btn">Browse</label>
+            </div>
+            <input id="file" type="file" accept=".csv,.xlsx,.xls,.json" class="sr-only" />
             <div id="loaded" class="muted" style="margin-top:8px;display:none"></div>
           </div>
 
@@ -96,7 +105,12 @@
       </div>
     </div>
 
-    <footer>© <span id="y"></span> Adigi · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="how-to.html">How&nbsp;To</a> · <a href="mailto:adigisoftware.com?subject=Adigi%20Sync%20Support&body=Please%20describe%20your%20file%20type%20and%20the%20issue.">Support</a></footer>
+    <footer>© <span id="y"></span> Adigi ·
+      <a href="how-to.html">How&nbsp;To</a> ·
+      <a href="privacy.html">Privacy</a> ·
+      <a href="terms.html">Terms</a> ·
+      <a href="mailto:support@adigi-software.co.uk">Support</a>
+    </footer>
   </div>
 
 <script>
@@ -110,7 +124,6 @@
   const $ = (id) => document.getElementById(id);
   const drop = $('drop');
   const fileInput = $('file');
-  const browse = $('browse');
   const loaded = $('loaded');
   const preview = $('preview');
   const target = $('target');
@@ -121,14 +134,14 @@
   const progressText = $('progressText');
   const errorBox = $('error');
   const convertBtn = $('convert');
-  fileInput.addEventListener('change', (e) => { const f = e.target.files[0]; if (f) handleFile(f); });
 
+  // Drag & drop wiring
   drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('drag'); });
   drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
-  drop.addEventListener('drop', (e) => {
-    e.preventDefault(); drop.classList.remove('drag');
-    const f = e.dataTransfer.files[0]; if (f) handleFile(f);
-  });
+  drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+  // Native browse picker
+  fileInput.addEventListener('change', (e) => { const f = e.target.files[0]; if (f) handleFile(f); });
 
   function detectType(name) {
     const n = name.toLowerCase();
@@ -138,10 +151,11 @@
     return 'unknown';
   }
 
+  // Safari-safe normaliser (no Unicode property escapes)
   function normaliseKey(k){
     return k.normalize('NFKD')
-      .replace(/\\p{Diacritic}/gu,'')
-      .replace(/[^\\p{L}\\p{N}]+/gu,'_')
+      .replace(/[\u0300-\u036f]/g,'')     // strip diacritics
+      .replace(/[^A-Za-z0-9]+/g,'_')      // non-alnum → _
       .replace(/_{2,}/g,'_')
       .replace(/^_|_$/g,'')
       .toLowerCase();
@@ -243,7 +257,7 @@
     return s.replace(/[&<>\"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\\'':'&#39;'})[c]; });
   }
 
-  convertBtn.addEventListener('click', function(){
+  document.getElementById('convert').addEventListener('click', function(){
     if(!loadedFile) return;
     try{
       const tgt = target.value;
@@ -264,15 +278,15 @@
       } else if(tgt==='json'){
         if(tablePreview){
           const { header, rows } = tablePreview;
-          const objs = rows.map(function(r){ return Object.fromEntries(header.map(function(h,i){ return [h, r[i]]; })); });
+          const objs = rows.map(r=> Object.fromEntries(header.map((h,i)=>[h, r[i]])) );
           downloadText(JSON.stringify(objs,null,2), swapExt(loadedFile.name, '.json'));
         } else if(jsonPreview){
           downloadText(JSON.stringify(jsonPreview,null,2), swapExt(loadedFile.name, '.json'));
         }
       } else if(tgt==='xlsx'){
         if(tablePreview){
-          const { header, rows } = tablePreview;
-          const ws = XLSX.utils.aoa_to_sheet([header, ...rows]); const wb = XLSX.utils.book_new();
+          const { header, rows } = tablePreview; const aoa=[header,...rows];
+          const ws = XLSX.utils.aoa_to_sheet(aoa); const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
           const wbout = XLSX.write(wb,{bookType:'xlsx',type:'array'});
           downloadBlob(new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), swapExt(loadedFile.name, '.xlsx'));
